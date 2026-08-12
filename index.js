@@ -35,6 +35,14 @@ client.once("ready", () => {
   console.log(`Factr is online as ${client.user.tag}`);
 });
 
+client.on("error", (err) => {
+  console.error("Discord client error:", err);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.error("Unhandled rejection:", err);
+});
+
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
@@ -63,16 +71,17 @@ client.on("messageCreate", async (message) => {
       return;
     }
 
+    const fields = [];
+    if (result.rating) fields.push({ name: "Rating", value: result.rating, inline: true });
+    if (result.publisher) fields.push({ name: "Reviewed by", value: result.publisher, inline: true });
+
     const embed = new EmbedBuilder()
       .setColor(VERDICT_COLOR[result.verdict.label] ?? 0x95a5a6)
       .setTitle(`${result.verdict.emoji} FACTR VERDICT: ${result.verdict.label}`)
       .setDescription(`**Claim:** ${claim}`)
-      .addFields(
-        result.rating ? [{ name: "Rating", value: result.rating, inline: true }] : [],
-        result.publisher ? [{ name: "Reviewed by", value: result.publisher, inline: true }] : []
-      )
       .setFooter({ text: "factr · settling arguments with sources since today" });
 
+    if (fields.length) embed.addFields(fields);
     if (result.snippet) embed.addFields({ name: "Summary", value: result.snippet });
     if (result.url) embed.setURL(result.url);
 
