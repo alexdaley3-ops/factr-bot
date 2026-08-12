@@ -30,14 +30,14 @@ function extractClaim(rawContent, botUserId) {
 function ratingToVerdict(textualRating) {
   if (!textualRating) return { emoji: "❓", label: "UNVERIFIED" };
   const r = textualRating.toLowerCase();
+  if (/(mostly true|mostly false|half true|half false|mixed|partly|misleading|exaggerat)/.test(r)) {
+    return { emoji: "⚠️", label: "MIXED" };
+  }
   if (/(false|pants on fire|incorrect|fabricated|hoax|debunk)/.test(r)) {
     return { emoji: "❌", label: "FALSE" };
   }
-  if (/(true|correct|accurate)/.test(r) && !/(mostly|half)/.test(r)) {
+  if (/(true|correct|accurate)/.test(r)) {
     return { emoji: "✅", label: "TRUE" };
-  }
-  if (/(mostly true|mostly false|half true|mixed|partly|misleading|exaggerat)/.test(r)) {
-    return { emoji: "⚠️", label: "MIXED" };
   }
   return { emoji: "❓", label: "UNVERIFIED" };
 }
